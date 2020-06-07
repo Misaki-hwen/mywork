@@ -7,6 +7,7 @@ class HealthCheckController extends Controller {
   async add() {
     const { ctx } = this;
     const params = ctx.request.body;
+    console.log(params);
     const res = await ctx.service.healthcheck.add(params);
     ctx.body = { code: 200, msg: '添加成功', data: res };
 
@@ -21,6 +22,25 @@ class HealthCheckController extends Controller {
     const params = ctx.request.body;
     console.log(params);
     const res = await ctx.service.healthcheck.delete(params);
+    ctx.body = { code: 200, data: res };
+  }
+  // 更新单条数据
+  async update() {
+    const { ctx } = this;
+    const params = ctx.request.body;
+    console.log(params);
+    const res = await ctx.service.healthcheck.update(params);
+    console.log(res)
+
+    ctx.body = { code: 200, msg:"修改成功", data: res };
+
+  }
+  // 提交按钮提交所有数据
+  async updateMany() {
+    const { ctx } = this;
+    const params = ctx.request.body;
+    console.log(params)
+    const res = await this.ctx.service.healthcheck.updateMany(params);
     ctx.body = { code: 200, data: res };
   }
 }

@@ -9,6 +9,9 @@ import Manage from '../views/manageEmployees/Manage.vue'
 import ManageList from '../views/manageEmployees/ManageList.vue'
 import DefendManage from '../views/defendProductTable/DefendManage.vue'
 import HealthExaminationTable from '../views/HealthExaminationProgram/HealthExaminationTable.vue'
+import ShowTables from '../views/HealthExaminationProgram/ShowTables.vue'
+import SuspectedTable from '../views/HealthExaminationProgram/SuspectedTable.vue'
+import template from '../views/template.vue'
 
 
 
@@ -42,6 +45,21 @@ Vue.use(VueRouter)
     path:'/HealthExaminationTable',
     name:'HealthExaminationTable',
     component:HealthExaminationTable
+  },
+  {
+    path:'/ShowTables',
+    name:'ShowTables',
+    component: ShowTables
+  },
+  {
+    path:'/SuspectedTable',
+    name:'SuspectedTable',
+    component: SuspectedTable
+  },
+  {
+    path:'/template',
+    name:'template',
+    component: template
   }
 ]
 

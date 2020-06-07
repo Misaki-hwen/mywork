@@ -43,4 +43,6 @@ module.exports = app => {
   router.post('/addCheckInfo', controller.healthcheck.add);
   router.get('/getCheckInfo', controller.healthcheck.get);
   router.post('/deleteCheckInfo', controller.healthcheck.delete);
+  router.post('/updateCheckInfo',controller.healthcheck.update);
+  router.post('/updateManyCheckInfo',controller.healthcheck.updateMany);
 };

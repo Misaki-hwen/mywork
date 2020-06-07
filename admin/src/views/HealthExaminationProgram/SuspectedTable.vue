@@ -1,52 +1,43 @@
 <template>
 <el-card class="box-card">
     <div slot="header" class="clearfix">
-        <span>职业健康检查结果汇总表</span>
+        <span>疑似职业病患者表</span>
         <el-button style="float: right; padding: 3px 0" type="primary" icon="el-icon-arrow-left">
             <router-link :to="{path:'/ShowTables'}" style="text-decoration: none; ">上一页</router-link>
         </el-button>
     </div>
     <div class="template">
         <!-- <el-button size="mini" style="margin-left:16px;" @click.prevent="add">新增</el-button> -->
-        <el-popover placement="right" trigger="hover">
+        <el-popover placement="right" trigger="hover" >
             <upload-excel-component :on-success="handleSuccess" :before-upload="beforeUpload" />
             <p></p>
             <el-link @click.prevent="add()">手动录入</el-link>
-            <el-button slot="reference" type='primary' size='mini'>新建</el-button>
+            <el-button slot="reference" type='primary' size='mini' >新建</el-button>
         </el-popover>
         <el-button size="mini" type="primary" plain="" @click.stop='handleDownload' style="margin-left:16px;">下载模板</el-button>
-
+        
     </div>
     <el-divider></el-divider>
 
     <!-- 表单 -->
-    <el-table :data="HealthExaminationTable" style="width: 100%">
-        <el-table-column prop="checkDate" label="检查日期">
-            <template slot-scope="scope">
-                {{scope.row.checkDate | fmtdate}}
-            </template>
+    <el-table :data="SuspectedTable" style="width: 100%">
+        <el-table-column prop="num" label="序号">
         </el-table-column>
-        <el-table-column prop="organization" label="检查机构">
+        <el-table-column prop="name" label="姓名">
         </el-table-column>
-        <el-table-column prop="checkType" label="体检种类">
+        <el-table-column prop="sex" label="性别">
         </el-table-column>
-        <el-table-column prop="shouldCheckNum" label="应检人数">
+        <el-table-column prop="age" label="年龄">
         </el-table-column>
-        <el-table-column prop="actuallNum" label="实检人数">
+        <el-table-column prop="position" label="岗位">
         </el-table-column>
-        <el-table-column label="检查结果（人数）">
-            <el-table-column prop="normal" label="未见异常" width="120">
-            </el-table-column>
-            <el-table-column prop="re_examination" label="复查" width="120">
-            </el-table-column>
-            <el-table-column prop="suspected" label="疑似" width="120">
-            </el-table-column>
-            <el-table-column prop="forbid" label="禁忌症" width="120">
-            </el-table-column>
-            <el-table-column prop="otherDisease" label="其他疾患" width="120">
-            </el-table-column>
+        <el-table-column prop="factorOfDanger" label="危害因素">
         </el-table-column>
-        <el-table-column prop="comment" label="备注">
+        <el-table-column prop="illness" label="可能导致的职业病">
+        </el-table-column>
+        <el-table-column prop="CwithO" label="结论与意见">
+        </el-table-column>
+        <el-table-column prop="status" label="落实情况">
         </el-table-column>
         <el-table-column label="操作">
             <template slot-scope="scope">
@@ -64,47 +55,40 @@
         <el-button type="primary" @click.prevent="submit()">提交</el-button>
         <el-button type="warning" @click.prevent="reset()">重置</el-button>
     </div>
-
+    
+    
     <!-- 1.新增信息对话框 -->
     <el-dialog title="新增数据" :visible.sync="showAddDialog">
         <el-form :model="form" label-position="left">
-            <el-form-item label="检查时间:">
-                <el-date-picker size="large" v-model="form.checkDate" type="date" placeholder="选择日期">
-                </el-date-picker>
+            <el-form-item label="序号:">
+                <el-input v-model="form.num"></el-input>
             </el-form-item>
-            <el-form-item label="检查机构:">
-                <el-input v-model="form.organization"></el-input>
+            <el-form-item label="姓名:">
+                <el-input v-model="form.sex"></el-input>
             </el-form-item>
-            <el-form-item label="体检种类">
+            <el-form-item label="性别">
                 <el-radio-group v-model="form.checkType">
-                    <el-radio label="0">上岗前 </el-radio>
-                    <el-radio label="1">在岗期间</el-radio>
-                    <el-radio label="2">离岗时</el-radio>
+                    <el-radio label="0">男 </el-radio>
+                    <el-radio label="1">女</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item label="应检人数:">
-                <el-input v-model="form.shouldCheckNum"></el-input>
+            <el-form-item label="年龄:">
+                <el-input v-model="form.age"></el-input>
             </el-form-item>
-            <el-form-item label="实检人数:">
-                <el-input v-model="form.actuallNum"></el-input>
+            <el-form-item label="岗位:">
+                <el-input v-model="form.position"></el-input>
             </el-form-item>
-            <el-form-item label="未见异常人数:">
-                <el-input v-model="form.normal"></el-input>
+            <el-form-item label="危害因素:">
+                <el-input v-model="form.factorOfDanger"></el-input>
             </el-form-item>
-            <el-form-item label="复查人数:">
-                <el-input v-model="form.re_examination"></el-input>
+            <el-form-item label="可能导致的职业病:">
+                <el-input v-model="form.illness"></el-input>
             </el-form-item>
-            <el-form-item label="疑似人数:">
-                <el-input v-model="form.suspected"></el-input>
+            <el-form-item label="结论与意见:">
+                <el-input v-model="form.CwithO" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容"></el-input>
             </el-form-item>
-            <el-form-item label="禁忌症人数:">
-                <el-input v-model="form.forbid"></el-input>
-            </el-form-item>
-            <el-form-item label="其他疾患人数:">
-                <el-input v-model="form.otherDisease"></el-input>
-            </el-form-item>
-            <el-form-item label="备注:">
-                <el-input v-model="form.comment" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容"></el-input>
+            <el-form-item label="落实情况:">
+                <el-input v-model="form.status" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容"></el-input>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -113,7 +97,46 @@
         </div>
     </el-dialog>
     <!-- 2.更新信息对话框 -->
-    <el-dialog title="更新数据" :visible.sync="showUpdateDialog">
+    <el-dialog title="修改数据" :visible.sync="showUpdateDialog">
+        <el-form :model="form" label-position="left">
+            <el-form-item label="序号:">
+                <el-input v-model="form.num"></el-input>
+            </el-form-item>
+            <el-form-item label="姓名:">
+                <el-input v-model="form.sex"></el-input>
+            </el-form-item>
+            <el-form-item label="性别">
+                <el-radio-group v-model="form.checkType">
+                    <el-radio label="0">男 </el-radio>
+                    <el-radio label="1">女</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="年龄:">
+                <el-input v-model="form.age"></el-input>
+            </el-form-item>
+            <el-form-item label="岗位:">
+                <el-input v-model="form.position"></el-input>
+            </el-form-item>
+            <el-form-item label="危害因素:">
+                <el-input v-model="form.factorOfDanger"></el-input>
+            </el-form-item>
+            <el-form-item label="可能导致的职业病:">
+                <el-input v-model="form.illness"></el-input>
+            </el-form-item>
+            <el-form-item label="结论与意见:">
+                <el-input v-model="form.CwithO" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容"></el-input>
+            </el-form-item>
+            <el-form-item label="落实情况:">
+                <el-input v-model="form.status" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="showUpdateDialog = false">取 消</el-button>
+            <el-button type="primary" @click="updateInfoDialog()">保 存</el-button>
+        </div>
+    </el-dialog>
+
+    <!-- <el-dialog title="更新数据" :visible.sync="showUpdateDialog">
         <el-form :model="form" label-position="left">
             <el-form-item label="检查时间:">
                 <el-date-picker size="large" v-model="form.checkDate" type="date" placeholder="选择日期">
@@ -158,7 +181,7 @@
             <el-button @click="showUpdateDialog = false">取 消</el-button>
             <el-button type="primary" @click="updateInfoDialog()">保 存</el-button>
         </div>
-    </el-dialog>
+    </el-dialog> -->
 </el-card>
 </template>
 
@@ -171,7 +194,7 @@ export default {
     data() {
         return {
             form: {},
-            HealthExaminationTable: [],
+            SuspectedTable: [],
             showAddDialog: false,
             showUpdateDialog: false,
             total: -1,
@@ -183,12 +206,12 @@ export default {
         handleCurrentChange(val) {
             console.log(`当前页: ${val}`);
             this.pagenum = val
-            this.fetchHealthCheckTable()
+            this.fetchSuspectedTable()
         },
         handleSizeChange(val) {
             console.log(`每页 ${val} 条`);
             this.pagesize = val
-            this.fetchHealthCheckTable()
+            this.fetchSuspectedTable()
         },
         beforeUpload(file) {
             const isLt1M = file.size / 1024 / 1024 < 1
@@ -249,7 +272,7 @@ export default {
                     message: '删除成功!'
                 });
             })
-            this.fetchHealthCheckTable();
+            this.fetchSuspectedTable();
         },
         async update(row) {
             this.form = row
@@ -265,7 +288,7 @@ export default {
             if (code === 200) {
                 this.$message.success(msg);
                 this.showAddDialog = false;
-                this.fetchHealthCheckTable();
+                this.fetchSuspectedTable();
             }
         },
         async updateInfoDialog() {
@@ -278,11 +301,11 @@ export default {
             if (code === 200) {
                 this.$message.success(msg);
                 this.showUpdateDialog = false;
-                this.fetchHealthCheckTable();
+                this.fetchSuspectedTable();
             }
         },
 
-        async fetchHealthCheckTable() {
+        async fetchSuspectedTable() {
             // let params = {
             //     pagesize:this.pagesize,
             //     pagenum:this.pagenum
@@ -293,7 +316,7 @@ export default {
         }
     },
     mounted() {
-        this.fetchHealthCheckTable()
+        this.fetchSuspectedTable()
     },
 }
 </script>
