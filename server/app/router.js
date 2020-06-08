@@ -38,11 +38,16 @@ module.exports = app => {
   // 文件删除
   router.post('/deletefile', controller.defendproducts.deletefile);
   router.post('/upload', controller.defendproducts.add);
+
   // 职业健康检查
-  // 添加
   router.post('/addCheckInfo', controller.healthcheck.add);
   router.get('/getCheckInfo', controller.healthcheck.get);
   router.post('/deleteCheckInfo', controller.healthcheck.delete);
-  router.post('/updateCheckInfo',controller.healthcheck.update);
-  router.post('/updateManyCheckInfo',controller.healthcheck.updateMany);
+  router.post('/updateCheckInfo', controller.healthcheck.update);
+  router.post('/updateManyCheckInfo', controller.healthcheck.insertMany);
+
+  // 疑似职业病患者表
+  router.post('/addSuspectInfo', controller.suspectlist.add);
+  router.post('/insertSuspectInfo', controller.suspectlist.insertMany);
+  router.get('/findSuspectInfo', controller.suspectlist.get);
 };

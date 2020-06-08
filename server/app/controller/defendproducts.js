@@ -135,9 +135,7 @@ class DefendProductsController extends Controller {
   async add() {
     const { ctx } = this;
     const params = await this.parseData();
-    console.log('333333333333333333333333333333333333333');
     console.log(params);
-    // const params = ctx.request.body
     const res = await ctx.service.defendproducts.add(params);
     ctx.body = { code: 200, data: res };
   }

@@ -36,7 +36,7 @@ module.exports = appInfo => {
   };
   // 配置跨域
   config.cors = {
-    origin: 'http://localhost:8081',
+    origin: 'http://localhost:8080',
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
     credentials: true,
   };

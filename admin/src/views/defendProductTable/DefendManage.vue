@@ -178,6 +178,7 @@ export default {
                 this.approvalFileErr = ''
             } else {
                 this.approvalFileErr = '请上传图片、pdf或word文件!'
+                
             }
         },
         async onRemoveInvoice(file, filelist) {
@@ -264,7 +265,7 @@ export default {
             let params = new FormData()
             params.append('formData', JSON.stringify(this.form.tableData))
             params.append('companyId', '人生无极限有限公司')
-            // params.append('invoice', this.form.invioceFile[0].raw)
+            // params.append('invoice', this.form.invioceFile[0].raw) 
             this.form.invioceFile.forEach((item, i) => {
                 item.raw && params.append('invoice' + i, item.raw)
             })

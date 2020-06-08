@@ -30,17 +30,17 @@ class HealthCheckController extends Controller {
     const params = ctx.request.body;
     console.log(params);
     const res = await ctx.service.healthcheck.update(params);
-    console.log(res)
+    console.log(res);
 
-    ctx.body = { code: 200, msg:"修改成功", data: res };
+    ctx.body = { code: 200, msg: '修改成功', data: res };
 
   }
   // 提交按钮提交所有数据
-  async updateMany() {
+  async insertMany() {
     const { ctx } = this;
     const params = ctx.request.body;
-    console.log(params)
-    const res = await this.ctx.service.healthcheck.updateMany(params);
+    console.log(params);
+    const res = await this.ctx.service.healthcheck.insertMany(params);
     ctx.body = { code: 200, data: res };
   }
 }

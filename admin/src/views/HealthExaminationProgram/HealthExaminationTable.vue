@@ -2,8 +2,8 @@
 <el-card class="box-card">
     <div slot="header" class="clearfix">
         <span>职业健康检查结果汇总表</span>
-        <el-button style="float: right; padding: 3px 0" type="primary" icon="el-icon-arrow-left">
-            <router-link :to="{path:'/ShowTables'}" style="text-decoration: none; ">上一页</router-link>
+        <el-button type="primary" icon="el-icon-arrow-left" @click="$router.go(-1)">
+            上一页
         </el-button>
     </div>
     <div class="template">
@@ -15,7 +15,6 @@
             <el-button slot="reference" type='primary' size='mini'>新建</el-button>
         </el-popover>
         <el-button size="mini" type="primary" plain="" @click.stop='handleDownload' style="margin-left:16px;">下载模板</el-button>
-
     </div>
     <el-divider></el-divider>
 
@@ -64,7 +63,6 @@
         <el-button type="primary" @click.prevent="submit()">提交</el-button>
         <el-button type="warning" @click.prevent="reset()">重置</el-button>
     </div>
-
     <!-- 1.新增信息对话框 -->
     <el-dialog title="新增数据" :visible.sync="showAddDialog">
         <el-form :model="form" label-position="left">
@@ -204,6 +202,7 @@ export default {
         handleSuccess({
             results
         }) {
+            this.HealthExaminationTable = []
             results.map(item => {
                 return this.HealthExaminationTable.push({
                     checkDate: item.检查日期,
@@ -229,9 +228,14 @@ export default {
             this.showAddDialog = true
         },
         async submit() {
-            this.$http.post('/updateManyCheckInfo', {
+            await this.$http.post('/updateManyCheckInfo', {
                 params: this.HealthExaminationTable
             })
+            this.$message({
+                type: 'success',
+                message: '删除成功!'
+            });
+            this.fetchHealthCheckTable();
 
         },
         async del(row) {
@@ -248,8 +252,9 @@ export default {
                     type: 'success',
                     message: '删除成功!'
                 });
+                this.fetchHealthCheckTable();
             })
-            this.fetchHealthCheckTable();
+
         },
         async update(row) {
             this.form = row
@@ -266,6 +271,7 @@ export default {
                 this.$message.success(msg);
                 this.showAddDialog = false;
                 this.fetchHealthCheckTable();
+                this.form = {}
             }
         },
         async updateInfoDialog() {
@@ -307,5 +313,12 @@ export default {
 
 .clearfix {
     display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.clearfix .el-button {
+    position: absolute;
+    right: 15px;
 }
 </style>

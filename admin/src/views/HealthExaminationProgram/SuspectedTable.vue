@@ -2,20 +2,34 @@
 <el-card class="box-card">
     <div slot="header" class="clearfix">
         <span>疑似职业病患者表</span>
-        <el-button style="float: right; padding: 3px 0" type="primary" icon="el-icon-arrow-left">
-            <router-link :to="{path:'/ShowTables'}" style="text-decoration: none; ">上一页</router-link>
+        <el-button type="primary" icon="el-icon-arrow-left" @click="$router.go(-1)">
+            上一页
         </el-button>
     </div>
+    <!-- 附件上传 -->
+    <el-form>
+        <el-form-item prop="uploadSingleFile" :inline="false" label="附件上传区:">
+        <el-upload multiple :on-preview="handlePictureCardPreview" action="" :file-list="fileList" :on-change='onChangeReport' :auto-upload="false" :on-remove="onRemoveReport">
+            <el-button size="small" type="primary">体检报告（上传）</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传图片、pdf类型文件</div>
+        </el-upload>
+        <el-dialog :visible.sync="showDialogReport">
+            <img width="100%" :src="dialogImageUrl" alt="">
+        </el-dialog>
+        <div class="el-form-item__error">{{reportFileErr}}</div>
+    </el-form-item>
+    </el-form>
+    <el-divider></el-divider>
+
+    <!-- 模板下载 -->
     <div class="template">
-        <!-- <el-button size="mini" style="margin-left:16px;" @click.prevent="add">新增</el-button> -->
-        <el-popover placement="right" trigger="hover" >
+        <el-popover placement="right" trigger="hover">
             <upload-excel-component :on-success="handleSuccess" :before-upload="beforeUpload" />
             <p></p>
             <el-link @click.prevent="add()">手动录入</el-link>
-            <el-button slot="reference" type='primary' size='mini' >新建</el-button>
+            <el-button slot="reference" type='primary' size='mini'>新建</el-button>
         </el-popover>
         <el-button size="mini" type="primary" plain="" @click.stop='handleDownload' style="margin-left:16px;">下载模板</el-button>
-        
     </div>
     <el-divider></el-divider>
 
@@ -55,8 +69,7 @@
         <el-button type="primary" @click.prevent="submit()">提交</el-button>
         <el-button type="warning" @click.prevent="reset()">重置</el-button>
     </div>
-    
-    
+
     <!-- 1.新增信息对话框 -->
     <el-dialog title="新增数据" :visible.sync="showAddDialog">
         <el-form :model="form" label-position="left">
@@ -135,53 +148,6 @@
             <el-button type="primary" @click="updateInfoDialog()">保 存</el-button>
         </div>
     </el-dialog>
-
-    <!-- <el-dialog title="更新数据" :visible.sync="showUpdateDialog">
-        <el-form :model="form" label-position="left">
-            <el-form-item label="检查时间:">
-                <el-date-picker size="large" v-model="form.checkDate" type="date" placeholder="选择日期">
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="检查机构:">
-                <el-input v-model="form.organization"></el-input>
-            </el-form-item>
-            <el-form-item label="体检种类">
-                <el-radio-group v-model="form.checkType">
-                    <el-radio label="0">上岗前 </el-radio>
-                    <el-radio label="1">在岗期间</el-radio>
-                    <el-radio label="2">离岗时</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item label="应检人数:">
-                <el-input v-model="form.shouldCheckNum"></el-input>
-            </el-form-item>
-            <el-form-item label="实检人数:">
-                <el-input v-model="form.actuallNum"></el-input>
-            </el-form-item>
-            <el-form-item label="未见异常人数:">
-                <el-input v-model="form.normal"></el-input>
-            </el-form-item>
-            <el-form-item label="复查人数:">
-                <el-input v-model="form.re_examination"></el-input>
-            </el-form-item>
-            <el-form-item label="疑似人数:">
-                <el-input v-model="form.suspected"></el-input>
-            </el-form-item>
-            <el-form-item label="禁忌症人数:">
-                <el-input v-model="form.forbid"></el-input>
-            </el-form-item>
-            <el-form-item label="其他疾患人数:">
-                <el-input v-model="form.otherDisease"></el-input>
-            </el-form-item>
-            <el-form-item label="备注:">
-                <el-input v-model="form.comment" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容"></el-input>
-            </el-form-item>
-        </el-form>
-        <div slot="footer" class="dialog-footer">
-            <el-button @click="showUpdateDialog = false">取 消</el-button>
-            <el-button type="primary" @click="updateInfoDialog()">保 存</el-button>
-        </div>
-    </el-dialog> -->
 </el-card>
 </template>
 
@@ -200,9 +166,59 @@ export default {
             total: -1,
             pagenum: 1,
             pagesize: 2,
+            fileList:[],
+            reportFileErr:'',
+            showDialogReport: false,
+            dialogImageUrl: '',
+            originalFile:[]
         }
     },
     methods: {
+        // 附件上传
+        async onRemoveReport(file, filelist) {
+            console.log(file)
+            console.log(filelist)
+            this.$confirm(`确定移除“${file.name}”?`, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(async () => {
+                let str = file.url.split('public/');
+                await this.$http.post('/deletefile', {
+                    _id: this.formId,
+                    invoice: str[1]
+                })
+                this.$message({
+                    type: 'success',
+                    message: '删除成功!'
+                });
+            })
+        },
+        onChangeReport(file, filelist) {
+            console.log(file);
+            this.fileList = filelist
+            this.fileList = filelist
+            if (file.raw.type === 'image/jpg' || file.raw.type === 'image/gif' || file.raw.type === 'image/bmp' || file.raw.type ===
+                'image/jpeg' || file.raw.type === 'image/png' || file.raw.type === 'application/pdf') {
+                this.approvalFileErr = ''
+            } else {
+                this.approvalFileErr = '请上传图片、pdf或word文件!'
+            }
+        },
+        handlePictureCardPreview(file) {
+            console.log(file)
+            let fileSplite = file.name.split('.')
+            if (fileSplite[fileSplite.length - 1] === 'pdf') {
+                let a = document.createElement('a')
+                a.href = file.raw ? URL.createObjectURL(file.raw) : file.url
+                a.target = '_blank'
+                a.click()
+            } else {
+                this.reportFileErr = file.raw ? URL.createObjectURL(file.raw) : file.url
+                this.reportFileErr = true
+            }
+        },
+        // 分页
         handleCurrentChange(val) {
             console.log(`当前页: ${val}`);
             this.pagenum = val
@@ -224,37 +240,42 @@ export default {
             })
             return false
         },
+        // 模板导入
         handleSuccess({
             results
         }) {
             results.map(item => {
-                return this.HealthExaminationTable.push({
-                    checkDate: item.检查日期,
-                    organization: item.检查机构,
-                    checkType: item.体检种类,
-                    shouldCheckNum: item.应检人数,
-                    actuallNum: item.实检人数,
-                    normal: item.未见异常,
-                    re_examination: item.复查,
-                    suspected: item.疑似,
-                    forbid: item.禁忌症,
-                    otherDisease: item.其他疾患,
-                    comment: item.备注,
+                return this.SuspectedTable.push({
+                    num: item.序号,
+                    name: item.姓名,
+                    // sex: `${item.性别='男'?1:0} `,
+                    age: item.年龄,
+                    position: item.岗位,
+                    factorOfDanger: item.危害因素,
+                    illness: item.可能导致的职业病,
+                    CwithO: item.结论与意见,
+                    status: item.落实情况,
                 })
             })
         },
         handleDownload() {
             let a = document.createElement('a')
-            a.href = 'http://127.0.0.1:7001/public/excel/职业健康检查结果汇总表.xlsx'
+            a.href = 'http://127.0.0.1:7001/public/excel/疑似职业病患者表.xlsx'
             a.click()
         },
+        //表单
         add() {
             this.showAddDialog = true
         },
         async submit() {
-            this.$http.post('/updateManyCheckInfo', {
-                params: this.HealthExaminationTable
+            let params = new FormData()
+            params.append('formData', JSON.stringify(this.SuspectedTable))
+            params.append('companyId','人生无极限有限公司')
+            this.fileList.forEach((item, i) => {
+                item.raw && params.append('file' + i, item.raw)
             })
+            params.append('originalFile',JSON.stringify(this.originalFile))
+            this.$http.post('/insertSuspectInfo', params)
 
         },
         async del(row) {
@@ -279,7 +300,7 @@ export default {
             this.showUpdateDialog = true
         },
         async saveInfoDialog() {
-            let res = await this.$http.post('/addCheckInfo', this.form)
+            let res = await this.$http.post('/addSuspectInfo', this.SuspectedTable)
             console.log(res);
             const {
                 code,
@@ -289,6 +310,7 @@ export default {
                 this.$message.success(msg);
                 this.showAddDialog = false;
                 this.fetchSuspectedTable();
+                this.form = {}
             }
         },
         async updateInfoDialog() {
@@ -306,13 +328,17 @@ export default {
         },
 
         async fetchSuspectedTable() {
-            // let params = {
-            //     pagesize:this.pagesize,
-            //     pagenum:this.pagenum
-            // }
-            let res = await this.$http.get('/getCheckInfo')
+            let res = await this.$http.get('/findSuspectInfo')
             console.log(res)
-            this.HealthExaminationTable = res.data.data;
+            this.SuspectedTable = res.data.data.formData;
+            this.fileList = res.data.data.fileList.map(item => {
+                    return {
+                        name: item.name,
+                        url: 'http://localhost:7001/public/' + item.webname
+                    };
+                })
+            this.originalFile = res.data.data.fileList
+            console.log(this.fileList)
         }
     },
     mounted() {
@@ -330,5 +356,12 @@ export default {
 
 .clearfix {
     display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.clearfix .el-button {
+    position: absolute;
+    right: 15px;
 }
 </style>

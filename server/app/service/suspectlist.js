@@ -2,20 +2,20 @@
 
 const Service = require('egg').Service;
 
-class RoleService extends Service {
+class SuspectedListService extends Service {
   async add(params) {
     const { ctx } = this;
     try {
-      const res = await ctx.model.Healthcheck.create(params);
+      const res = await ctx.model.Suspectlist.create(params);
       console.log(res);
     } catch (error) {
       throw error;
     }
   }
-  async get() {
+  async get(e) {
     const { ctx } = this;
     try {
-      const res = await ctx.model.Healthcheck.find().limit(5);
+      const res = await ctx.model.Suspectlist.findOne({ companyId: e.companyId }).limit(5);
       return res;
     } catch (error) {
       throw error;
@@ -24,7 +24,7 @@ class RoleService extends Service {
   async delete(params) {
     const { ctx } = this;
     try {
-      const res = await ctx.model.Healthcheck.remove({ _id: params });
+      const res = await ctx.model.Suspectlist.remove({ _id: params });
       console.log(res);
     } catch (error) {
       throw error;
@@ -33,7 +33,7 @@ class RoleService extends Service {
   async update(params) {
     const { ctx } = this;
     try {
-      const res = await ctx.model.Healthcheck.update({ _id: params._id }, { $set: params });
+      const res = await ctx.model.Suspectlist.update({ _id: params._id }, { $set: params });
       console.log(res);
     } catch (error) {
       throw error;
@@ -43,7 +43,7 @@ class RoleService extends Service {
     const { ctx } = this;
     try {
       console.log(params);
-      const res = await ctx.model.Healthcheck.insertMany(params.params);
+      const res = await ctx.model.Suspectlist.update({ companyId: params.companyId }, params, { upsert: true });
       console.log(res);
     } catch (error) {
       throw error;
@@ -51,4 +51,4 @@ class RoleService extends Service {
   }
 }
 
-module.exports = RoleService;
+module.exports = SuspectedListService;
