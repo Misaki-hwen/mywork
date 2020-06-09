@@ -50,4 +50,5 @@ module.exports = app => {
   router.post('/addSuspectInfo', controller.suspectlist.add);
   router.post('/insertSuspectInfo', controller.suspectlist.insertMany);
   router.get('/findSuspectInfo', controller.suspectlist.get);
+  router.post('/deleteInllnessFile', controller.suspectlist.deletefile);
 };

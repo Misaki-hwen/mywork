@@ -23,3 +23,4 @@ module.exports = app => {
   });
   return mongoose.model('suspectlist', suspectlistSchema);
 };
+

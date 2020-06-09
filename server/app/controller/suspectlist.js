@@ -28,6 +28,13 @@ class SuspectedListController extends Controller {
     const res = await ctx.service.suspectlist.delete(params);
     ctx.body = { code: 200, data: res };
   }
+  async deletefile() {
+    const { ctx } = this;
+    const params = ctx.request.body;
+    console.log(params);
+    const res = await ctx.service.suspectlist.deletefile(params);
+    ctx.body = { code: 200, data: res };
+  }
   // 更新单条数据
   async update() {
     const { ctx } = this;
@@ -87,18 +94,16 @@ class SuspectedListController extends Controller {
       }
     }
     console.log(parts);
-    const originalFile = JSON.parse(parts.originalFile).filter(item => {
+    const originalFile = JSON.parse(parts.field.originalFile).filter(item => {
       return item.name && item.webname;
     });
-    console.log(originalFile);
     originalFile.map(item => {
       return fileList.push(item);
     });
-    console.log('here is mama');
-    console.log(fileList);
     params.companyId = parts.field.companyId;
     params.formData = JSON.parse(parts.field.formData);
     params.fileList = fileList;
+    console.log('===========kkkkkkkk===============');
     console.log(params);
     return params;
   }

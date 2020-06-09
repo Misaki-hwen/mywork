@@ -40,6 +40,9 @@
         <el-table-column prop="name" label="姓名">
         </el-table-column>
         <el-table-column prop="sex" label="性别">
+            <template slot-scope="scope">
+                {{scope.row.sex = 0 ? '男' : '女'}}
+            </template>
         </el-table-column>
         <el-table-column prop="age" label="年龄">
         </el-table-column>
@@ -55,8 +58,8 @@
         </el-table-column>
         <el-table-column label="操作">
             <template slot-scope="scope">
-                <el-button type="primary" icon="el-icon-edit" circle @click="update(scope.row)"></el-button>
-                <el-button type="danger" icon="el-icon-delete" circle @click="del(scope.row)"></el-button>
+                <el-button type="primary" icon="el-icon-edit" circle @click="update(scope)"></el-button>
+                <el-button type="danger" icon="el-icon-delete" circle @click="del(scope)"></el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -77,10 +80,10 @@
                 <el-input v-model="form.num"></el-input>
             </el-form-item>
             <el-form-item label="姓名:">
-                <el-input v-model="form.sex"></el-input>
+                <el-input v-model="form.name"></el-input>
             </el-form-item>
             <el-form-item label="性别">
-                <el-radio-group v-model="form.checkType">
+                <el-radio-group v-model="form.sex">
                     <el-radio label="0">男 </el-radio>
                     <el-radio label="1">女</el-radio>
                 </el-radio-group>
@@ -116,10 +119,10 @@
                 <el-input v-model="form.num"></el-input>
             </el-form-item>
             <el-form-item label="姓名:">
-                <el-input v-model="form.sex"></el-input>
+                <el-input v-model="form.name"></el-input>
             </el-form-item>
             <el-form-item label="性别">
-                <el-radio-group v-model="form.checkType">
+                <el-radio-group v-model="form.sex">
                     <el-radio label="0">男 </el-radio>
                     <el-radio label="1">女</el-radio>
                 </el-radio-group>
@@ -170,7 +173,9 @@ export default {
             reportFileErr:'',
             showDialogReport: false,
             dialogImageUrl: '',
-            originalFile:[]
+            originalFile:[],
+            updateIndex:'',
+            formId : '',
         }
     },
     methods: {
@@ -184,9 +189,9 @@ export default {
                 type: 'warning'
             }).then(async () => {
                 let str = file.url.split('public/');
-                await this.$http.post('/deletefile', {
+                await this.$http.post('/deleteInllnessFile', {
                     _id: this.formId,
-                    invoice: str[1]
+                    file: str[1]
                 })
                 this.$message({
                     type: 'success',
@@ -276,31 +281,22 @@ export default {
             })
             params.append('originalFile',JSON.stringify(this.originalFile))
             this.$http.post('/insertSuspectInfo', params)
+            this.fetchSuspectedTable();
 
         },
-        async del(row) {
-
+        async del(scope) {
             this.$confirm(`确定移除?`, '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(async () => {
-                await this.$http.post('/deleteCheckInfo', {
-                    _id: row._id
-                })
-                this.$message({
-                    type: 'success',
-                    message: '删除成功!'
-                });
+                this.SuspectedTable.splice(scope.$index,1)
             })
-            this.fetchSuspectedTable();
+            
         },
-        async update(row) {
-            this.form = row
-            this.showUpdateDialog = true
-        },
+        
         async saveInfoDialog() {
-            let res = await this.$http.post('/addSuspectInfo', this.SuspectedTable)
+            let res = await this.$http.post('/addSuspectInfo', this.form)
             console.log(res);
             const {
                 code,
@@ -313,23 +309,27 @@ export default {
                 this.form = {}
             }
         },
-        async updateInfoDialog() {
-            let res = await this.$http.post('/updateCheckInfo', this.form)
-            console.log(res);
-            const {
-                code,
-                msg
-            } = res.data
-            if (code === 200) {
-                this.$message.success(msg);
-                this.showUpdateDialog = false;
-                this.fetchSuspectedTable();
+        async update(scope) {
+            this.updateIndex = scope.$index;
+            console.log(scope.row)
+            this.form = scope.row
+            if(scope.row.sex){
+                let sex = scope.row.sex === '女' ? '1' : '0'
+                this.form.sex = sex
             }
+            console.log(this.form)
+            this.showUpdateDialog = true
+
+        },
+        async updateInfoDialog() {
+            this.SuspectedTable.splice(this.updateIndex,1,this.form)
+            this.showUpdateDialog = false;
         },
 
         async fetchSuspectedTable() {
             let res = await this.$http.get('/findSuspectInfo')
             console.log(res)
+            this.formId = res.data.data._id;
             this.SuspectedTable = res.data.data.formData;
             this.fileList = res.data.data.fileList.map(item => {
                     return {
@@ -338,7 +338,6 @@ export default {
                     };
                 })
             this.originalFile = res.data.data.fileList
-            console.log(this.fileList)
         }
     },
     mounted() {

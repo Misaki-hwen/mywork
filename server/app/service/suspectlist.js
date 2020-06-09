@@ -6,7 +6,7 @@ class SuspectedListService extends Service {
   async add(params) {
     const { ctx } = this;
     try {
-      const res = await ctx.model.Suspectlist.create(params);
+      const res = await ctx.model.Suspectlist.update({ companyId: '人生无极限有限公司' }, { $addToSet: { formData: params } });
       console.log(res);
     } catch (error) {
       throw error;
@@ -26,6 +26,17 @@ class SuspectedListService extends Service {
     try {
       const res = await ctx.model.Suspectlist.remove({ _id: params });
       console.log(res);
+    } catch (error) {
+      throw error;
+    }
+  }
+  async deletefile(params) {
+    const { ctx } = this;
+    try {
+      if (params.file) {
+        // await ctx.model.Defendproducts.updateOne({ _id: params._id }, { $unset: { invoice: { webname: params.invoice } } });
+        await ctx.model.Suspectlist.updateOne({ _id: params._id }, { $pull: { fileList: { webname: params.file } } });
+      }
     } catch (error) {
       throw error;
     }

@@ -28,6 +28,9 @@
         <el-table-column prop="organization" label="检查机构">
         </el-table-column>
         <el-table-column prop="checkType" label="体检种类">
+            <template  slot-scope="scope">
+                {{scope.row.checkType == 0 ? '上岗前': scope.row.checkType == 1 ? '在岗期间' : '离岗时'}}
+            </template>
         </el-table-column>
         <el-table-column prop="shouldCheckNum" label="应检人数">
         </el-table-column>
