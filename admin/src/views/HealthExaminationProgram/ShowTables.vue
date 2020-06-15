@@ -33,6 +33,9 @@ export default {
                 documentName: '疑似职业病患者表',
                 link:'SuspectedTable'
             }, {
+                documentName: '职业病危害事故报告和处理记录',
+                link:'ReportAndRecord'
+            }, {
                 documentName: '防护用品管理列表',
                 link:'defend'
             }]

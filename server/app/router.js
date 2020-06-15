@@ -45,10 +45,19 @@ module.exports = app => {
   router.post('/deleteCheckInfo', controller.healthcheck.delete);
   router.post('/updateCheckInfo', controller.healthcheck.update);
   router.post('/updateManyCheckInfo', controller.healthcheck.insertMany);
+  router.get('/findyear',controller.healthcheck.findyear);
 
   // 疑似职业病患者表
   router.post('/addSuspectInfo', controller.suspectlist.add);
   router.post('/insertSuspectInfo', controller.suspectlist.insertMany);
   router.get('/findSuspectInfo', controller.suspectlist.get);
   router.post('/deleteInllnessFile', controller.suspectlist.deletefile);
+  
+  //职业病危害事故报告和处理记录
+  router.post('/addReportInfo', controller.report.add);
+  router.get('/getReportInfo', controller.report.get);
+  router.post('/deleteReportInfo', controller.report.delete);
+  router.post('/updateReportInfo', controller.report.update);
+  router.post('/updateManyReportInfo', controller.report.insertMany);
+  router.get('/findReportYear',controller.report.findyear);
 };

@@ -4,6 +4,7 @@ module.exports = app => {
   const mongoose = app.mongoose;
   const Schema = mongoose.Schema;
   const healthcheckSchema = new Schema({
+    year: String, // 年度
     checkDate: Date,
     organization: { type: String },
     checkType: { type: String },

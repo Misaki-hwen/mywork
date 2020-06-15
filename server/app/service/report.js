@@ -6,7 +6,7 @@ class ReportService extends Service {
   async add(params) {
     const { ctx } = this;
     try {
-      const res = await ctx.model.Healthcheck.create(params);
+      const res = await ctx.model.Report.create(params);
       console.log(res);
     } catch (error) {
       throw error;
@@ -15,7 +15,7 @@ class ReportService extends Service {
   async get() {
     const { ctx } = this;
     try {
-      const res = await ctx.model.Healthcheck.find().limit(5);
+      const res = await ctx.model.Report.find().limit(5);
       return res;
     } catch (error) {
       throw error;
@@ -24,7 +24,7 @@ class ReportService extends Service {
   async delete(params) {
     const { ctx } = this;
     try {
-      const res = await ctx.model.Healthcheck.remove({ _id: params });
+      const res = await ctx.model.Report.remove({ _id: params });
       console.log(res);
     } catch (error) {
       throw error;
@@ -33,7 +33,7 @@ class ReportService extends Service {
   async update(params) {
     const { ctx } = this;
     try {
-      const res = await ctx.model.Healthcheck.update({ _id: params._id }, { $set: params });
+      const res = await ctx.model.Report.update({ _id: params._id }, { $set: params });
       console.log(res);
     } catch (error) {
       throw error;
@@ -43,7 +43,7 @@ class ReportService extends Service {
     const { ctx } = this;
     try {
       console.log(params);
-      const res = await ctx.model.Healthcheck.insertMany(params.params);
+      const res = await ctx.model.Report.insertMany(params.params);
       console.log(res);
     } catch (error) {
       throw error;
@@ -55,9 +55,9 @@ class ReportService extends Service {
       console.log(params);
       let res = ''
       if(params.year == ''){
-         res = await ctx.model.Healthcheck.find();
+         res = await ctx.model.Report.find();
       }else{
-         res = await ctx.model.Healthcheck.find({year:params.year});
+         res = await ctx.model.Report.find({year:params.year});
       }
       console.log(res);
       return res;

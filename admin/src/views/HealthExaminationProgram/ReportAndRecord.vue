@@ -1,7 +1,7 @@
 <template>
 <el-card class="box-card">
     <div slot="header" class="clearfix">
-        <span>职业健康检查结果汇总表</span>
+        <span>职业病危害事故报告和处理记录</span>
         <el-button type="primary" icon="el-icon-arrow-left" @click="$router.go(-1)">
             上一页
         </el-button>
@@ -27,43 +27,42 @@
     <el-divider></el-divider>
 
     <!-- 表单 -->
-    <el-table :data="HealthExaminationTable" style="width: 100%">
+    <el-table :data="tableData" style="width: 100%">
         <el-table-column prop="year" label="年份">
         </el-table-column>
-
-        <el-table-column prop="organization" label="检查机构">
+        <el-table-column prop="company" label="企业名称">
         </el-table-column>
-        <el-table-column prop="checkType" label="体检种类">
-            <template slot-scope="scope">
-                {{scope.row.checkType == 0 ? '上岗前': scope.row.checkType == 1 ? '在岗期间' : '离岗时'}}
-            </template>
+        <el-table-column prop="principal" label="法人">
         </el-table-column>
-        <el-table-column prop="shouldCheckNum" label="应检人数">
+        <el-table-column prop="accidentReport" label="事故报告">
         </el-table-column>
-        <el-table-column prop="actuallNum" label="实检人数">
+        <el-table-column prop="contact" label="联系电话">
         </el-table-column>
-        <el-table-column label="检查结果（人数）">
-            <el-table-column prop="normal" label="未见异常">
-            </el-table-column>
-            <el-table-column prop="re_examination" label="复查">
-            </el-table-column>
-            <el-table-column prop="suspected" label="疑似">
-            </el-table-column>
-            <el-table-column prop="forbid" label="禁忌症">
-            </el-table-column>
-            <el-table-column prop="otherDisease" label="其他疾患">
-            </el-table-column>
+        <el-table-column prop="takeplace" label="发生时间">
         </el-table-column>
-        <el-table-column prop="comment" label="备注">
+        <el-table-column prop="site" label="发生场所">
         </el-table-column>
-        <el-table-column prop="checkDate" label="检查日期" width="110">
-            <template slot-scope="scope">
-                {{scope.row.checkDate | fmtdate}}
-            </template>
+        <el-table-column prop="postContent" label="岗位及工作内容">
+        </el-table-column>
+        <el-table-column prop="contactPeople" label="接触人数">
+        </el-table-column>
+        <el-table-column prop="infected" label="发病人数">
+        </el-table-column>
+        <el-table-column prop="treated" label="送医院治疗人数">
+        </el-table-column>
+        <el-table-column prop="die" label="死亡人数">
+        </el-table-column>
+        <el-table-column prop="factorName" label="能产生职业病的有害因素名称">
+        </el-table-column>
+        <el-table-column prop="describe" label="事故经过简述">
+        </el-table-column>
+        <el-table-column prop="opinion" label="对事故原因和性质的初步认定意见">
+        </el-table-column>
+        <el-table-column prop="reportTime" label="报告时间">
         </el-table-column>
         <el-table-column label="操作" width="130">
             <template slot-scope="scope">
-                <el-button type="primary" icon="el-icon-edit" circle @click="update(scope.row)"></el-button>
+                <el-button type="primary" icon="el-icon-edit" circle @click="update(scope)"></el-button>
                 <el-button type="danger" icon="el-icon-delete" circle @click="del(scope.row)"></el-button>
             </template>
         </el-table-column>
@@ -85,43 +84,54 @@
                 </el-form-item>
             </div>
             <div v-show="page==2">
-                <el-form-item label="检查时间:">
-                    <el-date-picker size="large" v-model="form.checkDate" type="date" placeholder="选择日期">
-                    </el-date-picker>
+                <el-form-item label="企业名称:">
+                    <el-input v-model="form.company"></el-input>
                 </el-form-item>
-                <el-form-item label="检查机构:">
-                    <el-input v-model="form.organization"></el-input>
+                <el-form-item label="法人:">
+                    <el-input v-model="form.principal"></el-input>
                 </el-form-item>
-                <el-form-item label="体检种类">
-                    <el-radio-group v-model="form.checkType">
-                        <el-radio label="0">上岗前 </el-radio>
-                        <el-radio label="1">在岗期间</el-radio>
-                        <el-radio label="2">离岗时</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item label="应检人数:">
-                    <el-input v-model="form.shouldCheckNum"></el-input>
-                </el-form-item>
-                <el-form-item label="实检人数:">
-                    <el-input v-model="form.actuallNum"></el-input>
+                <el-form-item label="事故报告:">
+                    <el-input v-model="form.accidentReport"></el-input>
                 </el-form-item>
                 <el-form-item label="未见异常人数:">
                     <el-input v-model="form.normal"></el-input>
                 </el-form-item>
-                <el-form-item label="复查人数:">
-                    <el-input v-model="form.re_examination"></el-input>
+                <el-form-item label="联系电话:">
+                    <el-input v-model="form.contact"></el-input>
                 </el-form-item>
-                <el-form-item label="疑似人数:">
-                    <el-input v-model="form.suspected"></el-input>
+                <el-form-item label="发生时间:">
+                    <el-input v-model="form.takeplace"></el-input>
                 </el-form-item>
-                <el-form-item label="禁忌症人数:">
-                    <el-input v-model="form.forbid"></el-input>
+                <el-form-item label="发生场所:">
+                    <el-input v-model="form.site"></el-input>
                 </el-form-item>
-                <el-form-item label="其他疾患人数:">
-                    <el-input v-model="form.otherDisease"></el-input>
+                <el-form-item label="岗位及工作内容:">
+                    <el-input v-model="form.postContent"></el-input>
                 </el-form-item>
-                <el-form-item label="备注:">
-                    <el-input v-model="form.comment" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容"></el-input>
+                <el-form-item label="接触人数:">
+                    <el-input v-model="form.contactPeople"></el-input>
+                </el-form-item>
+                <el-form-item label="发病人数:">
+                    <el-input v-model="form.infected"></el-input>
+                </el-form-item>
+                <el-form-item label="送医院治疗人数:">
+                    <el-input v-model="form.treated"></el-input>
+                </el-form-item>
+                <el-form-item label="死亡人数:">
+                    <el-input v-model="form.die"></el-input>
+                </el-form-item>
+                <el-form-item label="能产生职业病的有害因素名称:">
+                    <el-input v-model="form.factorName"></el-input>
+                </el-form-item>
+                <el-form-item label="事故经过简述:">
+                    <el-input v-model="form.describe"></el-input>
+                </el-form-item>
+                <el-form-item label="对事故原因和性质的初步认定意见:">
+                    <el-input v-model="form.opinion"></el-input>
+                </el-form-item>
+                <el-form-item label="报告时间:">
+                    <el-date-picker size="large" v-model="form.checkDate" type="date" placeholder="选择日期">
+                    </el-date-picker>
                 </el-form-item>
             </div>
         </el-form>
@@ -141,43 +151,54 @@
                 </el-form-item>
             </div>
             <div v-show="page==2">
-                <el-form-item label="检查时间:">
-                    <el-date-picker size="large" v-model="form.checkDate" type="date" placeholder="选择日期">
-                    </el-date-picker>
+                <el-form-item label="企业名称:">
+                    <el-input v-model="form.company"></el-input>
                 </el-form-item>
-                <el-form-item label="检查机构:">
-                    <el-input v-model="form.organization"></el-input>
+                <el-form-item label="法人:">
+                    <el-input v-model="form.principal"></el-input>
                 </el-form-item>
-                <el-form-item label="体检种类">
-                    <el-radio-group v-model="form.checkType">
-                        <el-radio label="0">上岗前 </el-radio>
-                        <el-radio label="1">在岗期间</el-radio>
-                        <el-radio label="2">离岗时</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item label="应检人数:">
-                    <el-input v-model="form.shouldCheckNum"></el-input>
-                </el-form-item>
-                <el-form-item label="实检人数:">
-                    <el-input v-model="form.actuallNum"></el-input>
+                <el-form-item label="事故报告:">
+                    <el-input v-model="form.accidentReport"></el-input>
                 </el-form-item>
                 <el-form-item label="未见异常人数:">
                     <el-input v-model="form.normal"></el-input>
                 </el-form-item>
-                <el-form-item label="复查人数:">
-                    <el-input v-model="form.re_examination"></el-input>
+                <el-form-item label="联系电话:">
+                    <el-input v-model="form.contact"></el-input>
                 </el-form-item>
-                <el-form-item label="疑似人数:">
-                    <el-input v-model="form.suspected"></el-input>
+                <el-form-item label="发生时间:">
+                    <el-input v-model="form.takeplace"></el-input>
                 </el-form-item>
-                <el-form-item label="禁忌症人数:">
-                    <el-input v-model="form.forbid"></el-input>
+                <el-form-item label="发生场所:">
+                    <el-input v-model="form.site"></el-input>
                 </el-form-item>
-                <el-form-item label="其他疾患人数:">
-                    <el-input v-model="form.otherDisease"></el-input>
+                <el-form-item label="岗位及工作内容:">
+                    <el-input v-model="form.postContent"></el-input>
                 </el-form-item>
-                <el-form-item label="备注:">
-                    <el-input v-model="form.comment" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容"></el-input>
+                <el-form-item label="接触人数:">
+                    <el-input v-model="form.contactPeople"></el-input>
+                </el-form-item>
+                <el-form-item label="发病人数:">
+                    <el-input v-model="form.infected"></el-input>
+                </el-form-item>
+                <el-form-item label="送医院治疗人数:">
+                    <el-input v-model="form.treated"></el-input>
+                </el-form-item>
+                <el-form-item label="死亡人数:">
+                    <el-input v-model="form.die"></el-input>
+                </el-form-item>
+                <el-form-item label="能产生职业病的有害因素名称:">
+                    <el-input v-model="form.factorName"></el-input>
+                </el-form-item>
+                <el-form-item label="事故经过简述:">
+                    <el-input v-model="form.describe"></el-input>
+                </el-form-item>
+                <el-form-item label="对事故原因和性质的初步认定意见:">
+                    <el-input v-model="form.opinion"></el-input>
+                </el-form-item>
+                <el-form-item label="报告时间:">
+                    <el-date-picker size="large" v-model="form.checkDate" type="date" placeholder="选择日期">
+                    </el-date-picker>
                 </el-form-item>
             </div>
         </el-form>
@@ -200,7 +221,7 @@ export default {
         return {
             page: 1,
             form: {},
-            HealthExaminationTable: [],
+            tableData: [],
             showAddDialog: false,
             showUpdateDialog: false,
             total: -1,
@@ -212,13 +233,17 @@ export default {
         }
     },
     methods: {
-        async chooseYear(val=''){
+        async chooseYear(val = '') {
             console.log(val)
-            const res = await this.$http.get('/findyear',{params:{year:this.selectYear}})
+            const res = await this.$http.get('/findReportYear', {
+                params: {
+                    year: this.selectYear
+                }
+            })
             console.log(res)
-            this.HealthExaminationTable = []
-            this.HealthExaminationTable = res.data.data
-                
+            this.tableData = []
+            this.tableData = res.data.data
+
         },
         handleCurrentChange(val) {
             console.log(`当前页: ${val}`);
@@ -244,20 +269,25 @@ export default {
         handleSuccess({
             results
         }) {
-            this.HealthExaminationTable = []
+            this.tableData = []
             results.map(item => {
-                return this.HealthExaminationTable.push({
-                    checkDate: item.检查日期,
-                    organization: item.检查机构,
-                    checkType: item.体检种类,
-                    shouldCheckNum: item.应检人数,
-                    actuallNum: item.实检人数,
-                    normal: item.未见异常,
-                    re_examination: item.复查,
-                    suspected: item.疑似,
-                    forbid: item.禁忌症,
-                    otherDisease: item.其他疾患,
-                    comment: item.备注,
+                return this.tableData.push({
+                    year: item.年份, // 年度
+                    company: item.企业名称,
+                    principal: item.法人,
+                    accidentReport: item.事故报告,
+                    contact: item.联系电话,
+                    takeplace: item.发生时间,
+                    site: item.发生场所,
+                    postContent: item.岗位及工作内容,
+                    contactPeople: item.接触人数,
+                    infected: item.发病人数,
+                    reated: item.送医院治疗人数,
+                    die: item.死亡人数,
+                    factorName: item.能产生职业病的有害因素名称,
+                    describe: item.事故经过简述,
+                    opinion: item.对事故原因和性质的初步认定意见,
+                    reportTime: item.报告时间,
                 })
             })
         },
@@ -270,8 +300,8 @@ export default {
             this.showAddDialog = true
         },
         async submit() {
-            await this.$http.post('/updateManyCheckInfo', {
-                params: this.HealthExaminationTable
+            await this.$http.post('/updateManyReportInfo', {
+                params: this.tableData
             })
             this.$message({
                 type: 'success',
@@ -287,7 +317,7 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(async () => {
-                await this.$http.post('/deleteCheckInfo', {
+                await this.$http.post('/deleteReportInfo', {
                     _id: row._id
                 })
                 this.$message({
@@ -298,12 +328,13 @@ export default {
             })
 
         },
-        async update(row) {
-            this.form = row
+        async update(scope) {
+            console.log(scope.row)
+            this.form = scope.row
             this.showUpdateDialog = true
         },
         async saveInfoDialog() {
-            let res = await this.$http.post('/addCheckInfo', this.form)
+            let res = await this.$http.post('/addReportInfo', this.form)
             console.log(res);
             const {
                 code,
@@ -317,7 +348,7 @@ export default {
             }
         },
         async updateInfoDialog() {
-            let res = await this.$http.post('/updateCheckInfo', this.form)
+            let res = await this.$http.post('/updateReportInfo', this.form)
             console.log(res);
             const {
                 code,
@@ -330,7 +361,7 @@ export default {
             }
         },
         async getAllYears() {
-            this.years = this.HealthExaminationTable.map(item => {
+            this.years = this.tableData.map(item => {
                 return {
                     label: this.$moment(item.year).format('YYYY'),
                     value: item.year
@@ -343,23 +374,30 @@ export default {
             console.log(this.years);
         },
         async fetchHealthCheckTable() {
-            let res = await this.$http.get('/getCheckInfo')
+            let res = await this.$http.get('/getReportInfo')
             console.log(res)
-            this.HealthExaminationTable = res.data.data;
-            console.log(this.HealthExaminationTable)
-            let year = this.HealthExaminationTable.map(item => {
+            this.tableData = res.data.data;
+            console.log(this.tableData)
+            let year = this.tableData.map(item => {
                 return item.year
             })
             year.sort()
+
             function unique(year) {
                 return Array.from(new Set(year))
             }
             console.log('==========')
             console.log(unique(year))
-            this.years = unique(year).map(item=>{
-                return {label:`${item}年`,value:item}
+            this.years = unique(year).map(item => {
+                return {
+                    label: `${item}年`,
+                    value: item
+                }
             })
-            this.years.unshift({label:'全部',value:''})
+            this.years.unshift({
+                label: '全部',
+                value: ''
+            })
             console.log(this.years)
         }
     },

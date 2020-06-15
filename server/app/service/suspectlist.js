@@ -6,8 +6,9 @@ class SuspectedListService extends Service {
   async add(params) {
     const { ctx } = this;
     try {
-      const res = await ctx.model.Suspectlist.update({ companyId: '人生无极限有限公司' }, { $addToSet: { formData: params } });
+      const res = await ctx.model.Suspectlist.updateOne({ companyId: '人生无极限有限公司' }, { $addToSet: { formData: params } });
       console.log(res);
+      return res;
     } catch (error) {
       throw error;
     }

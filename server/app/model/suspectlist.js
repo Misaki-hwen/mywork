@@ -6,6 +6,7 @@ module.exports = app => {
   const suspectlistSchema = new Schema({
     companyId: { type: String },
     formData: [{
+      year: String, 
       num: { type: String },
       name: { type: String },
       sex: { type: String },

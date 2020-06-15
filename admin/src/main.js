@@ -13,6 +13,8 @@ Vue.filter('fmtdate',(v) => {
   return moment(v).format('YYYY-MM-DD')
 })
 
+Vue.prototype.$moment = moment
+
 new Vue({
   router,
   render: h => h(App)

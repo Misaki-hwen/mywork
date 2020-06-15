@@ -9,15 +9,15 @@
     <!-- 附件上传 -->
     <el-form>
         <el-form-item prop="uploadSingleFile" :inline="false" label="附件上传区:">
-        <el-upload multiple :on-preview="handlePictureCardPreview" action="" :file-list="fileList" :on-change='onChangeReport' :auto-upload="false" :on-remove="onRemoveReport">
-            <el-button size="small" type="primary">体检报告（上传）</el-button>
-            <div slot="tip" class="el-upload__tip">只能上传图片、pdf类型文件</div>
-        </el-upload>
-        <el-dialog :visible.sync="showDialogReport">
-            <img width="100%" :src="dialogImageUrl" alt="">
-        </el-dialog>
-        <div class="el-form-item__error">{{reportFileErr}}</div>
-    </el-form-item>
+            <el-upload multiple :on-preview="handlePictureCardPreview" action="" :file-list="fileList" :on-change='onChangeReport' :auto-upload="false" :on-remove="onRemoveReport">
+                <el-button size="small" type="primary">体检报告（上传）</el-button>
+                <div slot="tip" class="el-upload__tip">只能上传图片、pdf类型文件</div>
+            </el-upload>
+            <el-dialog :visible.sync="showDialogReport">
+                <img width="100%" :src="dialogImageUrl" alt="">
+            </el-dialog>
+            <div class="el-form-item__error">{{reportFileErr}}</div>
+        </el-form-item>
     </el-form>
     <el-divider></el-divider>
 
@@ -35,6 +35,8 @@
 
     <!-- 表单 -->
     <el-table :data="SuspectedTable" style="width: 100%">
+        <el-table-column prop="year" label="年份">
+        </el-table-column>
         <el-table-column prop="num" label="序号">
         </el-table-column>
         <el-table-column prop="name" label="姓名">
@@ -76,6 +78,54 @@
     <!-- 1.新增信息对话框 -->
     <el-dialog title="新增数据" :visible.sync="showAddDialog">
         <el-form :model="form" label-position="left">
+            <div v-show="page==1">
+                <el-form-item label="年度" prop="year">
+                    <el-date-picker class="dataPicker" v-model="form.year" type="year" value-format="yyyy" placeholder="请选择年度">
+                    </el-date-picker>
+                </el-form-item>
+            </div>
+            <div v-show="page==2">
+                <el-form-item label="序号:">
+                    <el-input v-model="form.num"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名:">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item label="性别">
+                    <el-radio-group v-model="form.sex">
+                        <el-radio label="0">男 </el-radio>
+                        <el-radio label="1">女</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="年龄:">
+                    <el-input v-model="form.age"></el-input>
+                </el-form-item>
+                <el-form-item label="岗位:">
+                    <el-input v-model="form.position"></el-input>
+                </el-form-item>
+                <el-form-item label="危害因素:">
+                    <el-input v-model="form.factorOfDanger"></el-input>
+                </el-form-item>
+                <el-form-item label="可能导致的职业病:">
+                    <el-input v-model="form.illness"></el-input>
+                </el-form-item>
+                <el-form-item label="结论与意见:">
+                    <el-input v-model="form.CwithO" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容"></el-input>
+                </el-form-item>
+                <el-form-item label="落实情况:">
+                    <el-input v-model="form.status" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容"></el-input>
+                </el-form-item>
+
+            </div>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button v-show="page>1" @click="page-=1">上一页</el-button>
+            <el-button v-show="page<2" @click="page+=1">下一页</el-button>
+            <el-button v-show="page==2" @click="saveInfoDialog()" type="primary">提交</el-button>
+        </div>
+    </el-dialog>
+    <!-- <el-dialog title="新增数据" :visible.sync="showAddDialog">
+        <el-form :model="form" label-position="left">
             <el-form-item label="序号:">
                 <el-input v-model="form.num"></el-input>
             </el-form-item>
@@ -111,7 +161,7 @@
             <el-button @click="showAddDialog = false">取 消</el-button>
             <el-button type="primary" @click="saveInfoDialog()">保 存</el-button>
         </div>
-    </el-dialog>
+    </el-dialog> -->
     <!-- 2.更新信息对话框 -->
     <el-dialog title="修改数据" :visible.sync="showUpdateDialog">
         <el-form :model="form" label-position="left">
@@ -169,13 +219,14 @@ export default {
             total: -1,
             pagenum: 1,
             pagesize: 2,
-            fileList:[],
-            reportFileErr:'',
+            fileList: [],
+            reportFileErr: '',
             showDialogReport: false,
             dialogImageUrl: '',
-            originalFile:[],
-            updateIndex:'',
-            formId : '',
+            originalFile: [],
+            updateIndex: '',
+            formId: '',
+            page: 1
         }
     },
     methods: {
@@ -275,11 +326,11 @@ export default {
         async submit() {
             let params = new FormData()
             params.append('formData', JSON.stringify(this.SuspectedTable))
-            params.append('companyId','人生无极限有限公司')
+            params.append('companyId', '人生无极限有限公司')
             this.fileList.forEach((item, i) => {
                 item.raw && params.append('file' + i, item.raw)
             })
-            params.append('originalFile',JSON.stringify(this.originalFile))
+            params.append('originalFile', JSON.stringify(this.originalFile))
             this.$http.post('/insertSuspectInfo', params)
             this.fetchSuspectedTable();
 
@@ -290,11 +341,11 @@ export default {
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(async () => {
-                this.SuspectedTable.splice(scope.$index,1)
+                this.SuspectedTable.splice(scope.$index, 1)
             })
-            
+
         },
-        
+
         async saveInfoDialog() {
             let res = await this.$http.post('/addSuspectInfo', this.form)
             console.log(res);
@@ -313,7 +364,7 @@ export default {
             this.updateIndex = scope.$index;
             console.log(scope.row)
             this.form = scope.row
-            if(scope.row.sex){
+            if (scope.row.sex) {
                 let sex = scope.row.sex === '女' ? '1' : '0'
                 this.form.sex = sex
             }
@@ -322,7 +373,7 @@ export default {
 
         },
         async updateInfoDialog() {
-            this.SuspectedTable.splice(this.updateIndex,1,this.form)
+            this.SuspectedTable.splice(this.updateIndex, 1, this.form)
             this.showUpdateDialog = false;
         },
 
@@ -332,11 +383,11 @@ export default {
             this.formId = res.data.data._id;
             this.SuspectedTable = res.data.data.formData;
             this.fileList = res.data.data.fileList.map(item => {
-                    return {
-                        name: item.name,
-                        url: 'http://localhost:7001/public/' + item.webname
-                    };
-                })
+                return {
+                    name: item.name,
+                    url: 'http://localhost:7001/public/' + item.webname
+                };
+            })
             this.originalFile = res.data.data.fileList
         }
     },
